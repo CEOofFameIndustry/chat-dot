@@ -1,0 +1,27 @@
+{
+  "manifest_version": 2,
+  "name": "Chat Dot — Gemini / ChatGPT",
+  "version": "0.2.0",
+  "description": "Передає знімок стола 1 у вибраний чат Gemini або ChatGPT.",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "gemini-dot@local.invalid",
+      "strict_min_version": "109.0"
+    }
+  },
+  "permissions": [
+    "nativeMessaging",
+    "storage",
+    "https://gemini.google.com/*",
+    "https://chatgpt.com/*"
+  ],
+  "background": {
+    "scripts": [
+      "background.js"
+    ]
+  },
+  "browser_action": {
+    "default_title": "Gemini Dot",
+    "default_popup": "popup.html"
+  }
+}

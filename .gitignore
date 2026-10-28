@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+.env
+settings.json
+*.log
+ocr-failure.png
