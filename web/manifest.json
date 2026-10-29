@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
-  "name": "Chat Dot — Gemini / ChatGPT",
-  "version": "0.2.0",
+  "name": "Chat Dot — Gemini / ChatGPT / Claude",
+  "version": "0.3.0",
   "description": "Передає знімок стола 1 у вибраний чат Gemini або ChatGPT.",
   "browser_specific_settings": {
     "gecko": {
@@ -13,7 +13,8 @@
     "nativeMessaging",
     "storage",
     "https://gemini.google.com/*",
-    "https://chatgpt.com/*"
+    "https://chatgpt.com/*",
+    "https://claude.ai/*"
   ],
   "background": {
     "scripts": [

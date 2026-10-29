@@ -179,7 +179,7 @@ class Host:
             return
         if data.get("type") == "hello":
             target = str(data.get("target", ""))
-            if target.startswith(("https://gemini.google.com/", "https://chatgpt.com/")):
+            if target.startswith(("https://gemini.google.com/", "https://chatgpt.com/", "https://claude.ai/")):
                 self.target = target
                 self.last_status = "Вебчат підключено. ↑ — знімок столу 1; ↓ — скасувати."
         elif data.get("type") == "cancel-request":

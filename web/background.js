@@ -6,12 +6,12 @@ let message = "";
 let incoming = null;
 let active = null;
 function validChat(url) {
-  try {const u = new URL(url); return (u.origin === "https://gemini.google.com" && /^\/(?:u\/\d+\/)?app\/[a-zA-Z0-9_-]+$/.test(u.pathname)) || (u.origin === "https://chatgpt.com" && /^\/(?:g\/[a-zA-Z0-9_-]+\/)?c\/[a-zA-Z0-9-]+$/.test(u.pathname));}
+  try {const u = new URL(url); return (u.origin === "https://gemini.google.com" && /^\/(?:u\/\d+\/)?app\/[a-zA-Z0-9_-]+$/.test(u.pathname)) || (u.origin === "https://chatgpt.com" && /^\/(?:g\/[a-zA-Z0-9_-]+\/)?c\/[a-zA-Z0-9-]+$/.test(u.pathname)) || (u.origin === "https://claude.ai" && /^\/chat\/[a-zA-Z0-9-]+$/.test(u.pathname));}
   catch {return false;}
 }
 function canonical(url) {const u = new URL(url); return u.origin + u.pathname;}
 async function inject(tabId) {
-  const file = target.startsWith("https://chatgpt.com/") ? "chatgpt.js" : "content.js";
+  const file = target.startsWith("https://claude.ai/") ? "claude.js" : target.startsWith("https://chatgpt.com/") ? "chatgpt.js" : "content.js";
   // Reload the packaged adapter when working on an unpacked temporary extension.
   const response = await fetch(browser.runtime.getURL(file), {cache: "no-store"});
   if (!response.ok) throw new Error("Не вдалося прочитати адаптер чату.");
@@ -29,7 +29,7 @@ async function cancelJob(id) {
   }
 }
 async function startJob(job) {
-  const tabs = (await browser.tabs.query({url: ["https://gemini.google.com/*", "https://chatgpt.com/*"]}))
+  const tabs = (await browser.tabs.query({url: ["https://gemini.google.com/*", "https://chatgpt.com/*", "https://claude.ai/*"]}))
     .filter(tab => canonical(tab.url) === target);
   if (tabs.length !== 1) throw new Error("Відкрийте рівно одну вкладку вибраного чату. Перевірте адресу в розширенні.");
   const tab = tabs[0];
@@ -58,7 +58,7 @@ function connect() {
     if (data.type === "ready") {ready = true; message = "Готово. Відкрийте тест на столі 1 і натисніть ↑."; send({type: "hello", target});}
     else if (data.type === "diagnose") {
       (async () => {
-        const tabs = (await browser.tabs.query({url: ["https://gemini.google.com/*", "https://chatgpt.com/*"]})).filter(t => canonical(t.url) === target);
+        const tabs = (await browser.tabs.query({url: ["https://gemini.google.com/*", "https://chatgpt.com/*", "https://claude.ai/*"]})).filter(t => canonical(t.url) === target);
         if (tabs.length !== 1) return {error: "Не знайдено рівно одну вкладку вибраного чату.", matches: tabs.length};
         await inject(tabs[0].id);
         return browser.tabs.sendMessage(tabs[0].id, {type: "inspect"});
@@ -93,7 +93,7 @@ browser.runtime.onMessage.addListener(async (data, sender) => {
   if (data.action === "connect") {connect(); return {ok: true};}
   if (data.action === "status") {return {connected: ready, target, message};}
   if (data.action === "select") {
-    if (!validChat(data.url)) return {error: "Спершу відкрийте потрібну розмову на chatgpt.com або gemini.google.com."};
+    if (!validChat(data.url)) return {error: "Спершу відкрийте потрібну розмову на claude.ai, chatgpt.com або gemini.google.com."};
     if (active) return {error: "Спершу скасуйте поточний запит."};
     target = canonical(data.url);
     await browser.storage.local.set({target});
