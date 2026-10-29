@@ -157,7 +157,11 @@ class Host:
                 raise RuntimeError("Робочий стіл 1 змінив монітор. Запустіть запит знову.")
             _, after = dot.capture(screen)
             if dot.screen_changed(before, after, answer if answer["answers"] else {"answers": [{"y": y} for y in range(0, 1001, 50)]}):
-                raise RuntimeError("Питання на столі 1 змінилося. Стара відповідь не показана.")
+                # Pixel differences do not prove a different question (timers,
+                # notifications and selection highlights can change too).
+                # Preserve the reply, but do not place dots at uncertain positions.
+                answer = {"answers": [], "text": "Перевір: " + str(reply.get("text", "")).strip()}
+
             if job["cancelled"].is_set():
                 return
             self.last_status = "Відповідь: " + str(reply.get("text", ""))[:400]
