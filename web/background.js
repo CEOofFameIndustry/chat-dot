@@ -6,12 +6,12 @@ let message = "";
 let incoming = null;
 let active = null;
 function validChat(url) {
-  try {const u = new URL(url); return (u.origin === "https://gemini.google.com" && /^\/(?:u\/\d+\/)?app\/[a-zA-Z0-9_-]+$/.test(u.pathname)) || (u.origin === "https://chatgpt.com" && /^\/(?:g\/[a-zA-Z0-9_-]+\/)?c\/[a-zA-Z0-9-]+$/.test(u.pathname)) || (u.origin === "https://claude.ai" && /^\/chat\/[a-zA-Z0-9-]+$/.test(u.pathname));}
+  try {const u = new URL(url); return (u.origin === "https://gemini.google.com" && /^\/(?:u\/\d+\/)?app\/[a-zA-Z0-9_-]+$/.test(u.pathname)) || (u.origin === "https://chatgpt.com" && /^\/(?:(?:g\/[a-zA-Z0-9_-]+\/)?c|local)\/[a-zA-Z0-9-]+$/.test(u.pathname)) || (u.origin === "https://claude.ai" && /^\/chat\/[a-zA-Z0-9-]+$/.test(u.pathname));}
   catch {return false;}
 }
 function canonical(url) {const u = new URL(url); return u.origin + u.pathname;}
 async function inject(tabId) {
-  const file = target.startsWith("https://claude.ai/") ? "claude.js" : target.startsWith("https://chatgpt.com/") ? "chatgpt.js" : "content.js";
+  const file = new URL(target).pathname.startsWith("/local/") ? "codex.js" : target.startsWith("https://claude.ai/") ? "claude.js" : target.startsWith("https://chatgpt.com/") ? "chatgpt.js" : "content.js";
   // Reload the packaged adapter when working on an unpacked temporary extension.
   const response = await fetch(browser.runtime.getURL(file), {cache: "no-store"});
   if (!response.ok) throw new Error("Не вдалося прочитати адаптер чату.");
@@ -37,6 +37,10 @@ async function startJob(job) {
   active = {id: job.id, tabId: tab.id};
   try {
     await inject(tab.id);
+    if (new URL(target).pathname.startsWith('/local/')) {
+      const raw = atob(job.parts.join(''));
+      await browser.clipboard.setImageData(Uint8Array.from(raw, c => c.charCodeAt(0)).buffer, 'png');
+    }
     const reply = await browser.tabs.sendMessage(tab.id, {
       type: "solve", id: job.id, image: job.parts.join(""), mime: job.mime, url: target
     });

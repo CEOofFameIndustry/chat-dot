@@ -10,7 +10,7 @@ import subprocess
 
 FILES = ['web_bridge.py', 'web_support.py', 'desktop_support.py', 'overlay.qml',
          'web/manifest.json', 'web/background.js', 'web/content.js', 'web/popup.html',
-         'web/popup.js', 'web/chatgpt.js', 'web/claude.js', 'check-test/index.html', 'README.md', 'PROMPT.txt', 'install.py']
+         'web/popup.js', 'web/chatgpt.js', 'web/claude.js', 'web/codex.js', 'check-test/index.html', 'README.md', 'PROMPT.txt', 'install.py']
 
 def check():
     missing = [name for name in ['python3', 'firefox', 'grim', 'tesseract', 'qs', 'notify-send', 'hyprctl'] if not shutil.which(name)]
@@ -66,13 +66,13 @@ def main():
     lua = ('-- Gemini Dot: include once; Up/Down are global shortcuts.\n'
         + 'hl.bind("Up", hl.dsp.exec_cmd('+json.dumps(command+' run')+'), { release = true })\n'
         + 'hl.bind("Down", hl.dsp.exec_cmd('+json.dumps(command+' cancel')+'), { release = true })\n'
-        + 'hl.window_rule({name="gemini-dot-background", match={class="^firefox$", title=".*(Google Gemini|ChatGPT|Claude).*"}, render_unfocused=true})\n')
+        + 'hl.window_rule({name="gemini-dot-background", match={class="^firefox$", title=".*(Google Gemini|ChatGPT|Claude|Codex).*"}, render_unfocused=true})\n')
     # Quoted shell arguments in exec protect whitespace and shell metacharacters.
     # A literal config delimiter/newline in the installation path is unsupported.
     binds=f'bindr = , Up, exec, {command} run\nbindr = , Down, exec, {command} cancel\n'
     (target/'hyprland.lua').write_text(lua)
-    (target/'hyprland.conf').write_text(binds+'windowrule = render_unfocused on, match:class ^firefox$, match:title .*(Google Gemini|ChatGPT|Claude).*\n')
-    (target/'hyprland-legacy.conf').write_text(binds+'windowrulev2 = renderunfocused, class:^(firefox)$, title:.*(Google Gemini|ChatGPT|Claude).*\n')
+    (target/'hyprland.conf').write_text(binds+'windowrule = render_unfocused on, match:class ^firefox$, match:title .*(Google Gemini|ChatGPT|Claude|Codex).*\n')
+    (target/'hyprland-legacy.conf').write_text(binds+'windowrulev2 = renderunfocused, class:^(firefox)$, title:.*(Google Gemini|ChatGPT|Claude|Codex).*\n')
     print('Встановлено:',target)
     print('У Firefox завантажте тимчасове розширення:',target/'web/manifest.json')
     print('Підключіть ОДИН фрагмент Hyprland за README.md. Основні конфігурації не змінено.')
